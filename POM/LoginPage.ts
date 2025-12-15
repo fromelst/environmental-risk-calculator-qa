@@ -11,8 +11,8 @@ export class LoginPage {
         this.signInButton = page.locator('button[type="submit"]');
     }
 
-    async enterEmail(email: string) {
-        await this.usernameInput.fill(email);
+    async enterUsername(username: string) {
+        await this.usernameInput.fill(username);
     }
 
     async enterPassword(password: string) {
@@ -23,8 +23,8 @@ export class LoginPage {
         await this.signInButton.click();
     }
 
-    async login(email: string, password: string) {
-        await this.enterEmail(email);
+    async login(username: string, password: string) {
+        await this.enterUsername(username);
         await this.enterPassword(password);
         await this.clickSignIn();
     }

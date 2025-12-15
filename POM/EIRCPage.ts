@@ -4,6 +4,7 @@ export class EIRCPage {
     readonly subtitle: Locator;
     readonly signOutBtn: Locator;
 
+    // User input
     readonly emissionsTitle: Locator;
     readonly emissionsSubtitle: Locator;
     readonly emissionsLowBtn: Locator;
@@ -51,12 +52,45 @@ export class EIRCPage {
 
     readonly hazardousHandlingTitle: Locator;
     readonly hazardousHandlingSubtitle: Locator;
-    readonly hazardousHandlingNoBtn: Locator;
-    readonly hazardousHandlingNoText: Locator;
-    readonly hazardousHandlingYesBtn: Locator;
-    readonly hazardousHandlingYesText: Locator;
+    readonly hazardousHandlingNoBtnText: Locator;
+    readonly hazardousHandlingNoBtnSubtext: Locator;
+    readonly hazardousHandlingYesBtnText: Locator;
+    readonly hazardousHandlingYesBtnSubtext: Locator;
 
-    readonly riskBreakdownSection: Locator;
+    // Risk Breakdown Calculator results
+    readonly totalEnvironmentalRisk: Locator;
+    readonly emissionsFactorRiskBreakdown: Locator;
+    readonly emissionsWeightRiskBreakdown: Locator;
+    readonly emissionsPercentage: Locator;
+    readonly emissionsEnvironmentalRiskPercentage: Locator;
+
+    readonly proximityFactorRiskBreakdown: Locator;
+    readonly proximityWeightRiskBreakdown: Locator;
+    readonly proximityPercentage: Locator;
+    readonly proximityEnvironmentalRiskPercentage: Locator;
+
+    readonly wasteManagementFactorRiskBreakdown: Locator;
+    readonly wasteManagementWeightRiskBreakdown: Locator;
+    readonly wasteManagementPercentage: Locator;
+    readonly wasteManagementEnvironmentalRiskPercentage: Locator;
+
+    readonly recyclingFactorRiskBreakdown: Locator;
+    readonly recyclingWeightRiskBreakdown: Locator;
+    readonly recyclingPercentage: Locator;
+
+    readonly hazardousHandlingFactorRiskBreakdown: Locator;
+    readonly hazardousHandlingWeightRiskBreakdown: Locator;
+    readonly hazardousHandlingPercentage: Locator;
+
+    // Risk Breakdown Legend
+    readonly emissionsFactorLegend: Locator;
+    readonly emissionsWeightLegend: Locator;
+
+    readonly proximityFactorLegend: Locator;
+    readonly proximityWeightLegend: Locator;
+
+    readonly wasteManagementFactorLegend: Locator;
+    readonly wasteManagementWeightLegend: Locator;
 
     constructor(page: Page) {
         this.title = page.locator('h1');
@@ -94,7 +128,7 @@ export class EIRCPage {
 
         // Waste Management
         this.wasteManagementTitle = this.getFactorHeader(page, 'recycling', 'h3');
-        this.wasteManagementSubtitle = this.getFactorHeader(page, 'recycling', 'p');
+        this.wasteManagementSubtitle = this.getFactorHeader(page, 'recycling', 'p').nth(0);
 
         // Recycling
         this.recyclingTitle = page.locator('//*[@for="recycling"]');
@@ -115,31 +149,47 @@ export class EIRCPage {
 
         this.hazardousHandlingTitle = page.locator('//*[@for="hazardous"]');
         this.hazardousHandlingSubtitle = this.hazardousHandlingTitle.locator('..//..//p');
-        this.hazardousHandlingNoBtn = this.getHazardousBtnTitle(page, '1', '1');
-        this.hazardousHandlingNoText = this.getHazardousBtnTitle(page, '1', '2');
-        this.hazardousHandlingYesBtn = this.getHazardousBtnTitle(page, '2', '1');
-        this.hazardousHandlingYesText = this.getHazardousBtnTitle(page, '2', '2');
+        this.hazardousHandlingNoBtnText = this.getHazardousBtnTitle(page, '1', '1');
+        this.hazardousHandlingNoBtnSubtext = this.getHazardousBtnTitle(page, '1', '2');
+        this.hazardousHandlingYesBtnText = this.getHazardousBtnTitle(page, '2', '1');
+        this.hazardousHandlingYesBtnSubtext = this.getHazardousBtnTitle(page, '2', '2');
 
         // Total environmetal risk
         this.totalEnvironmentalRisk = page.locator('span.font-mono.font-bold');
 
-        // Risk Breakdown Section
-        /*
-        this.riskBreakdownSection = page.locator('//h3[text()="Risk Breakdown"]/ancestor::div[1]');
-        this.riskBreakDownTitle = this.riskBreakdownSection.locator('./h3');
-        this.factorPercentage = page.locator('span.font-mono.font-semibold.text-base');
-        this.emissionsPercentage = this.factorPercentage.nth(0);
-        this.proximityPercentage = this.factorPercentage.nth(1);
-        this.wasteManagementPercentage = this.factorPercentage.nth(2);
-        this.recyclingPercentage = page.locator('span.font-mono.font-semibold.text-sm').nth(0);
-        this.hazardousHandlingPercentage = page.locator('span.font-mono.font-semibold.text-sm').nth(1);
-        */
-        this.emissionsFactorRiskBreakdown = this.getFactor(page, 'CO₂ Emissions');
-        this.emissionsWeightRiskBreakdown = this.emissionsFactorRiskBreakdown.locator('./following-sibling::span');
-        this.emissionsPercentage = this.emissionsFactorRiskBreakdown.locator('./..//following-sibling::div/span').nth(0);
-        this.emissionsEnvironmentalRiskPercentage = this.emissionsFactorRiskBreakdown.locator('./..//following-sibling::div/span').nth(1);
+        // Risk Breakdown Calculator
+        this.emissionsFactorRiskBreakdown = this.getFactorWeightCalculator(page, 'CO₂ Emissions');
+        this.emissionsWeightRiskBreakdown = this.emissionsFactorRiskBreakdown.locator('~ span'); // zou nu moeten werken, '~ span' zou ook moeten werken xpath=following-sibling::span
+        this.emissionsPercentage = this.emissionsFactorRiskBreakdown.locator('xpath=//..//following-sibling::div[1]//span[1]');
+        this.emissionsEnvironmentalRiskPercentage = this.emissionsFactorRiskBreakdown.locator('xpath=//..//following-sibling::div[1]//span[2]');
 
+        this.proximityFactorRiskBreakdown = this.getFactorWeightCalculator(page, 'Proximity to Protected Areas');
+        this.proximityWeightRiskBreakdown = this.proximityFactorRiskBreakdown.locator('~ span');
+        this.proximityPercentage = this.proximityFactorRiskBreakdown.locator('xpath=//..//following-sibling::div[1]//span[1]');
+        this.proximityEnvironmentalRiskPercentage = this.proximityFactorRiskBreakdown.locator('xpath=//..//following-sibling::div[1]//span[2]');
 
+        this.wasteManagementFactorRiskBreakdown = this.getFactorWeightCalculator(page, 'Waste Management');
+        this.wasteManagementWeightRiskBreakdown = this.wasteManagementFactorRiskBreakdown.locator('~ span');
+        this.wasteManagementPercentage = this.wasteManagementFactorRiskBreakdown.locator('xpath=//..//following-sibling::div[1]//span[1]');
+        this.wasteManagementEnvironmentalRiskPercentage = this.wasteManagementFactorRiskBreakdown.locator('xpath=//..//following-sibling::div[1]//span[2]');
+
+        this.recyclingFactorRiskBreakdown = this.getFactorWeightCalculator(page, 'Recycling Efficiency');
+        this.recyclingWeightRiskBreakdown = this.recyclingFactorRiskBreakdown.locator('~ span');
+        this.recyclingPercentage = this.recyclingFactorRiskBreakdown.locator('xpath=//..//following-sibling::div[1]//span');
+
+        this.hazardousHandlingFactorRiskBreakdown = this.getFactorWeightCalculator(page, 'Hazardous Waste Handling');
+        this.hazardousHandlingWeightRiskBreakdown = this.hazardousHandlingFactorRiskBreakdown.locator('~ span');
+        this.hazardousHandlingPercentage = this.hazardousHandlingFactorRiskBreakdown.locator('xpath=//..//following-sibling::div[1]//span');
+
+        // Risk Breakdown Legend
+        this.emissionsFactorLegend = this.getFactorWeightsLegend(page, 'CO₂ Emissions');
+        this.emissionsWeightLegend = this.emissionsFactorLegend.locator('~ span');
+
+        this.proximityFactorLegend = this.getFactorWeightsLegend(page, 'Proximity to Protected Areas');
+        this.proximityWeightLegend = this.proximityFactorLegend.locator('~ span');
+
+        this.wasteManagementFactorLegend = this.getFactorWeightsLegend(page, 'Waste Management');
+        this.wasteManagementWeightLegend = this.wasteManagementFactorLegend.locator('~ span');
     }
 
     private getFactorBtn(page: Page, section: string, level: string): Locator {
@@ -158,9 +208,18 @@ export class EIRCPage {
         return page.locator('//*[@for="hazardous"]//..//..//label[' + label + ']//span[' + span + ']');
     }
 
-    private getFactor(page: Page, factor: string): Locator {
-        return page.locator('//span[normalize-space()="' + factor + '"]');
+    private getFactorWeightCalculator(page: Page, factor: string): Locator {
+        return page.locator('//span[normalize-space()="' + factor + '"]').nth(0);
     }
 
-    private
+    private getFactorWeightsLegend(page: Page, factor: string): Locator {
+        return page.locator('//span[normalize-space()="' + factor + '"]').nth(1);
+    }
+
+    public async setEverythingLowRisk() {
+        await this.emissionsLowText.click();
+        await this.proximityLowText.click();
+        await this.recyclingHighText.click();
+        await this.hazardousHandlingNoBtnText.click();
+    }
 }
