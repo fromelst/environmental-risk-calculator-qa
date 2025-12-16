@@ -2,8 +2,8 @@ import { test as base, expect } from '@playwright/test';
 import { LoginPage } from '../POM/LoginPage';
 import { EIRCPage } from '../POM/EIRCPage';
 import { AuthWorkflow } from '../workflows/auth-workflow.ts';
-import loginData from '../data/loginData.json';
-import { factorData } from '../Data/factorData';
+import loginData from '../test-data/loginData.json';
+import { factorData } from '../test-data/factorData.ts';
 import { percentageUtils } from '../utils/percentageUtils';
 
 const test = base.extend<{
@@ -188,5 +188,51 @@ test.describe('Calculator Check', () => {
     await expect.soft(eircPage.hazardousHandlingPercentage).toHaveText(factorData.hazardousHandling.options.no.value);
     await expect.soft(eircPage.totalEnvironmentalRisk).toHaveText(wasteCalculatedWeight);
   });
+
+  test('Everything Max Risk', async ({ eircPage }) => {
+    await eircPage.setEverythingHighRisk();
+
+    const emissionCalculatedWeight = percentageUtils.calculateFactorContribution(factorData.emissions.levels.high.value, factorData.emissions.weight);
+    const proximityCalculatedWeight = percentageUtils.calculateFactorContribution(factorData.proximity.levels.high.value, factorData.proximity.weight);
+    const wasteCalculatedWeight = percentageUtils.calculateFactorContributionWaste(factorData.wasteManagement.weight, factorData.recycling.weight, factorData.hazardousHandling.weight, factorData.recycling.levels.low.value, factorData.hazardousHandling.options.yes.value);
+    const totalRisk = percentageUtils.sumPercentages([emissionCalculatedWeight, proximityCalculatedWeight, wasteCalculatedWeight]);
+
+    await expect.soft(eircPage.emissionsEnvironmentalRiskPercentage).toHaveText("→ " + emissionCalculatedWeight + " of total");
+    await expect.soft(eircPage.proximityEnvironmentalRiskPercentage).toHaveText("→ " + proximityCalculatedWeight + " of total");
+    await expect.soft(eircPage.wasteManagementEnvironmentalRiskPercentage).toHaveText("→ " + wasteCalculatedWeight + " of total");
+
+    await expect.soft(eircPage.emissionsPercentage).toHaveText(factorData.emissions.levels.high.value);
+    await expect.soft(eircPage.proximityPercentage).toHaveText(factorData.proximity.levels.high.value);
+    await expect.soft(eircPage.wasteManagementPercentage).toHaveText(percentageUtils.calculateWastePercentage(factorData.recycling.weight, factorData.hazardousHandling.weight, factorData.recycling.levels.low.value, factorData.hazardousHandling.options.yes.value));
+    await expect.soft(eircPage.recyclingPercentage).toHaveText(factorData.recycling.levels.low.value);
+    await expect.soft(eircPage.hazardousHandlingPercentage).toHaveText(factorData.hazardousHandling.options.yes.value);
+
+    await expect.soft(eircPage.totalEnvironmentalRisk).toHaveText(totalRisk);
+  });
+
+  test('Mixed factors', async ({ eircPage }) => {
+    await eircPage.emissionsMediumText.click();
+    await eircPage.proximityHighText.click();
+    await eircPage.recyclingMediumText.click();
+    await eircPage.hazardousHandlingYesBtnText.click();
+
+    const emissionCalculatedWeight = percentageUtils.calculateFactorContribution(factorData.emissions.levels.medium.value, factorData.emissions.weight);
+    const proximityCalculatedWeight = percentageUtils.calculateFactorContribution(factorData.proximity.levels.high.value, factorData.proximity.weight);
+    const wasteCalculatedWeight = percentageUtils.calculateFactorContributionWaste(factorData.wasteManagement.weight, factorData.recycling.weight, factorData.hazardousHandling.weight, factorData.recycling.levels.medium.value, factorData.hazardousHandling.options.yes.value);
+    const totalRisk = percentageUtils.sumPercentages([emissionCalculatedWeight, proximityCalculatedWeight, wasteCalculatedWeight]);
+
+    await expect.soft(eircPage.emissionsEnvironmentalRiskPercentage).toHaveText("→ " + emissionCalculatedWeight + " of total");
+    await expect.soft(eircPage.proximityEnvironmentalRiskPercentage).toHaveText("→ " + proximityCalculatedWeight + " of total");
+    await expect.soft(eircPage.wasteManagementEnvironmentalRiskPercentage).toHaveText("→ " + wasteCalculatedWeight + " of total");
+
+    await expect.soft(eircPage.emissionsPercentage).toHaveText(factorData.emissions.levels.medium.value);
+    await expect.soft(eircPage.proximityPercentage).toHaveText(factorData.proximity.levels.high.value);
+    await expect.soft(eircPage.wasteManagementPercentage).toHaveText(percentageUtils.calculateWastePercentage(factorData.recycling.weight, factorData.hazardousHandling.weight, factorData.recycling.levels.medium.value, factorData.hazardousHandling.options.yes.value));
+    await expect.soft(eircPage.recyclingPercentage).toHaveText(factorData.recycling.levels.medium.value);
+    await expect.soft(eircPage.hazardousHandlingPercentage).toHaveText(factorData.hazardousHandling.options.yes.value);
+
+    await expect.soft(eircPage.totalEnvironmentalRisk).toHaveText(totalRisk);
+  });
+
 });
 

@@ -2,7 +2,7 @@ import { test as base, expect } from '@playwright/test';
 import { LoginPage } from '../POM/LoginPage';
 import { EIRCPage } from '../POM/EIRCPage';
 import { AuthWorkflow } from '../workflows/auth-workflow';
-import loginData from '../data/loginData.json';
+import loginData from '../test-data/loginData.json';
 
 const test = base.extend<{
   loginPage: LoginPage,

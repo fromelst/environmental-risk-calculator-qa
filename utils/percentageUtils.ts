@@ -27,4 +27,13 @@ export const percentageUtils = {
         const numericValue = parseFloat(percentage.replace('%', ''));
         return numericValue.toFixed(1) + '%';
     },
+
+    sumPercentages: (percentages: string[]): string => {
+        let sum = 0;
+        for (let i = 0; i < percentages.length; i++) {
+            percentages[i] = percentages[i].replace('%', '');
+            sum += parseFloat(percentages[i]);
+        }
+        return sum.toFixed(1) + '%';
+    }
 };

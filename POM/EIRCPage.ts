@@ -96,6 +96,7 @@ export class EIRCPage {
         this.title = page.locator('h1');
         this.subtitle = page.locator('header > p');
         this.signOutBtn = page.locator('button > svg');
+
         // Emissions
         this.emissionsTitle = this.getFactorHeader(page, 'emissions', 'h3');
         this.emissionsSubtitle = this.getFactorHeader(page, 'emissions', 'p');
@@ -159,7 +160,7 @@ export class EIRCPage {
 
         // Risk Breakdown Calculator
         this.emissionsFactorRiskBreakdown = this.getFactorWeightCalculator(page, 'CO₂ Emissions');
-        this.emissionsWeightRiskBreakdown = this.emissionsFactorRiskBreakdown.locator('~ span'); // zou nu moeten werken, '~ span' zou ook moeten werken xpath=following-sibling::span
+        this.emissionsWeightRiskBreakdown = this.emissionsFactorRiskBreakdown.locator('~ span');
         this.emissionsPercentage = this.emissionsFactorRiskBreakdown.locator('xpath=//..//following-sibling::div[1]//span[1]');
         this.emissionsEnvironmentalRiskPercentage = this.emissionsFactorRiskBreakdown.locator('xpath=//..//following-sibling::div[1]//span[2]');
 
@@ -221,5 +222,12 @@ export class EIRCPage {
         await this.proximityLowText.click();
         await this.recyclingHighText.click();
         await this.hazardousHandlingNoBtnText.click();
+    }
+
+    public async setEverythingHighRisk() {
+        await this.emissionsHighText.click();
+        await this.proximityHighText.click();
+        await this.recyclingLowText.click();
+        await this.hazardousHandlingYesBtnText.click();
     }
 }
